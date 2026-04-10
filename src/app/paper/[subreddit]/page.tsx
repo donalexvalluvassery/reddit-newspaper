@@ -46,7 +46,12 @@ export default function Newspaper({ params }: { params: { subreddit: string } })
     if (searchParams?.get("t")) query.set("t", searchParams.get("t")!);
     if (searchParams?.get("nsfw")) query.set("nsfw", searchParams.get("nsfw")!);
 
-    fetch(`/api/reddit?${query.toString()}`)
+    fetch(`/api/reddit?${query.toString()}`, {
+      headers: {
+         "ngrok-skip-browser-warning": "true",
+         "Bypass-Tunnel-Reminder": "true"
+      }
+    })
       .then((res) => res.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);

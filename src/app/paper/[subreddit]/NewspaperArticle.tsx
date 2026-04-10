@@ -51,7 +51,12 @@ export default function NewspaperArticle({ post, isHero = false, forceExpanded =
   useEffect(() => {
     if (showComments && comments.length === 0 && !loadingComments) {
       setLoadingComments(true);
-      fetch(`/api/reddit/comments?permalink=${encodeURIComponent(post.data.permalink)}`)
+      fetch(`/api/reddit/comments?permalink=${encodeURIComponent(post.data.permalink)}`, {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+          "Bypass-Tunnel-Reminder": "true"
+        }
+      })
         .then(res => res.json())
         .then(data => {
             if (!data.error) setComments(data);
@@ -92,7 +97,7 @@ export default function NewspaperArticle({ post, isHero = false, forceExpanded =
               
               {!isHero && getImageUrl(post) && (
                  /* eslint-disable-next-line @next/next/no-img-element */
-                 <img src={getImageUrl(post)!} alt="" className={styles.articleImage} crossOrigin="anonymous" />
+                 <img src={`/api/image-proxy?url=${encodeURIComponent(getImageUrl(post)!)}`} alt="" className={styles.articleImage} crossOrigin="anonymous" />
               )}
 
               <div className={styles.content}>
@@ -113,7 +118,7 @@ export default function NewspaperArticle({ post, isHero = false, forceExpanded =
             {isHero && getImageUrl(post) && (
               <div className={styles.heroImageContainer}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={getImageUrl(post)!} alt="" className={styles.articleImage} crossOrigin="anonymous" />
+                <img src={`/api/image-proxy?url=${encodeURIComponent(getImageUrl(post)!)}`} alt="" className={styles.articleImage} crossOrigin="anonymous" />
               </div>
             )}
          </div>
