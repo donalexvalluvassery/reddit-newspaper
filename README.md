@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🗞️ The Reddit Times (Newspaper Generator)
 
-## Getting Started
+A modern, containerized web application that transforms the front page of any subreddit into a visually stunning, retro-themed newspaper layout. Perfect for reading yesterday's internet at today's breakfast table.
 
-First, run the development server:
+🌍 **Live Demo:** [https://news.hasvac.com](https://news.hasvac.com)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Dynamic Masonry Layout**: Articles flow naturally downwards across columns seamlessly without whitespace, imitating a genuine broadsheet utilizing modern CSS multi-column pagination.
+- **Smart Visual Triage**: Our algorithm identifies visual posts (posts containing images) and anchors them explicitly to the Hero sections to guarantee a beautiful front-page presence, while text-heavy discussions flow below.
+- **True PDF Export Capability**: Instead of browser-enforced linear printing matrices, the application uses `html2pdf.js` to construct an exact pixel-perfect PDF replica of the screen styling. What you see is exactly what you get when you hit print!
+- **Clickable Content Links**: Every story acts as a hyperlink, elegantly taking you directly to the original discussion on Reddit.
+- **Advanced Control Matrix**: Filter the news by *Sort Criteria* (Top, Hot, New, Controversial), *Time Frames* (Past 24 Hours, Week, Year), and an optional *NSFW* toggle directly from the landing page.
+- **CORS Compliant**: Leverages a robust Next.js API server to proxy fetch requests, eliminating browser-side rate limits and Cross-Origin request failures.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router API)
+- **Styling**: Vanilla CSS (CSS Modules & CSS Columns)
+- **Typography**: Native Google Fonts (Playfair Display & Lora)
+- **Exporting**: html2pdf.js 
+- **Infrastructure**: Docker & Docker Compose
 
-## Learn More
+## 🚀 Quick Start (Docker)
 
-To learn more about Next.js, take a look at the following resources:
+The application is thoroughly containerized and optimized for production using a multi-stage Docker build. 
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/reddit-newspaper.git
+   cd reddit-newspaper
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Spin up the container:**
+   ```bash
+   docker compose up --build
+   ```
 
-## Deploy on Vercel
+3. **Read the news:**
+   Navigate to [http://localhost:3000](http://localhost:3000) inside your browser.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 💻 Manual Setup
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+If you wish to run the app natively without Docker, ensure you have **Node.js 18.17.0+** installed.
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## 📜 License
+
+This project is open-sourced under the MIT License.
