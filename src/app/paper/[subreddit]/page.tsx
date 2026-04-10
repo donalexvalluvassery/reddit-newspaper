@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import styles from "./paper.module.css";
 import html2pdf from "html2pdf.js";
+import NewspaperArticle from "./NewspaperArticle";
 
-// Basic interfaces for Reddit JSON
 interface RedditPost {
   data: {
     id: string;
@@ -17,6 +17,7 @@ interface RedditPost {
     is_video: boolean;
     post_hint?: string;
     permalink: string;
+    over_18: boolean;
   };
 }
 
@@ -24,7 +25,17 @@ export default function Newspaper({ params }: { params: { subreddit: string } })
   const [posts, setPosts] = useState<RedditPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  // PDF Generator States
+  const [showModal, setShowModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [expandAll, setExpandAll] = useState(true);
+  const [includeComments, setIncludeComments] = useState(false);
+  
+  // Active Print Directives
+  const [forceExpanded, setForceExpanded] = useState(false);
+  const [forceComments, setForceComments] = useState(false);
+
   const searchParams = useSearchParams();
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -40,10 +51,10 @@ export default function Newspaper({ params }: { params: { subreddit: string } })
       .then((data) => {
         if (data.error) throw new Error(data.error);
         if (data.data?.children) {
-          // Sort posts to push image-heavy ones to the front
+          const getImageUrl = (p: RedditPost) => (p.data.post_hint === 'image' || p.data.url?.match(/\.(jpeg|jpg|gif|png)$/i)) && !p.data.is_video;
           const withImages = data.data.children.filter((post: RedditPost) => getImageUrl(post));
           const withoutImages = data.data.children.filter((post: RedditPost) => !getImageUrl(post));
-          setPosts([...withImages, ...withoutImages].slice(0, 15)); // Take top 15 to keep it reasonable
+          setPosts([...withImages, ...withoutImages].slice(0, 15));
         } else {
           throw new Error("No posts found");
         }
@@ -52,18 +63,18 @@ export default function Newspaper({ params }: { params: { subreddit: string } })
       .finally(() => setLoading(false));
   }, [params.subreddit, searchParams]);
 
-  const handlePdfDownload = async () => {
+  const executePdf = async () => {
     const element = printRef.current;
     if (!element) return;
-    setIsGenerating(true);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const opt: any = {
-      margin: 0.5,
-      filename: `${params.subreddit}_times.pdf`,
-      image: { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
-      jsPDF: { unit: 'in', format: 'tabloid', orientation: 'portrait' }
+      margin:       0.5,
+      filename:     `${params.subreddit}_times.pdf`,
+      image:        { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'in', format: 'tabloid', orientation: 'portrait' as const },
+      pagebreak:    { mode: 'avoid-all', avoid: '.pdf-avoid-break' }
     };
 
     try {
@@ -73,24 +84,23 @@ export default function Newspaper({ params }: { params: { subreddit: string } })
       alert("Failed to generate PDF. Falling back to native print.");
       window.print();
     } finally {
+      // Revert styles
       setIsGenerating(false);
+      setShowModal(false);
+      setForceExpanded(false);
+      setForceComments(false);
     }
   };
 
-  const getImageUrl = (post: RedditPost) => {
-    let url = null;
-    if (post.data.post_hint === "image" && !post.data.is_video) {
-      url = post.data.url;
-    } else if (post.data.url && post.data.url.match(/\.(jpeg|jpg|gif|png)$/i)) {
-      url = post.data.url;
+  const startPdfGeneration = () => {
+    setIsGenerating(true);
+    setForceExpanded(expandAll);
+    if (includeComments) {
+      setForceComments(true);
+      setTimeout(() => executePdf(), 3500); // Allow fetches to complete
+    } else {
+      setTimeout(() => executePdf(), 500); // Allow masonry DOM to respond to expansion
     }
-    
-    if (url) {
-      // Decode HTML entities that Reddit sometimes includes in URLs (like &amp;)
-      const cleanUrl = url.replace(/&amp;/g, '&');
-      return `/api/image-proxy?url=${encodeURIComponent(cleanUrl)}`;
-    }
-    return null;
   };
 
   if (loading) return <div className={styles.loading}>Printing Press Warming Up...</div>;
@@ -109,68 +119,80 @@ export default function Newspaper({ params }: { params: { subreddit: string } })
 
   return (
     <>
-      <div className={styles.newspaperContainer} ref={printRef}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>The {params.subreddit} Times</h1>
-          <div className={styles.meta}>
+    <div className={styles.newspaperContainer} ref={printRef}>
+      <header className={styles.header}>
+         <h1 className={styles.title}>The {params.subreddit} Times</h1>
+         <div className={styles.meta}>
             <span>Vol. 1</span>
             <span>{currentDate}</span>
             <span>Est. 2026</span>
-          </div>
-        </header>
+         </div>
+      </header>
 
-        {/* Hero Article */}
-        {mainPost && (
-          <a href={`https://www.reddit.com${mainPost.data.permalink}`} target="_blank" rel="noopener noreferrer" className={`${styles.article} ${styles.heroArticle}`}>
-            <h2 className={`${styles.articleTitle} ${styles.mainArticleTitle}`}>{mainPost.data.title}</h2>
+      {mainPost && (
+         <NewspaperArticle 
+             post={mainPost} 
+             isHero={true} 
+             forceExpanded={forceExpanded} 
+             showComments={forceComments} 
+         />
+      )}
 
-            <div className={styles.heroContent}>
-              <div className={styles.heroText}>
-                <p className={`${styles.byline} ${styles.mainByline}`}>Reported by {mainPost.data.author}</p>
-                <div className={styles.content}>
-                  {mainPost.data.selftext ? (
-                    <p className={styles.dropCap}>{mainPost.data.selftext.substring(0, 1000)}{mainPost.data.selftext.length > 1000 ? '...' : ''}</p>
-                  ) : (
-                    <p className={styles.dropCap}>In today&apos;s top story circulating on the network, readers have drawn massive attention to emerging details. The subject at hand continues to gather reactions from the community at large. Full context is still developing...</p>
-                  )}
+      <div className={styles.columns}>
+        {restPosts.map((post, index) => (
+          <NewspaperArticle 
+             key={post.data.id} 
+             post={post} 
+             forceExpanded={forceExpanded}
+             showComments={forceComments && index < 5} // Limit comment fetches to top 5 articles to prevent Reddit 429
+          />
+        ))}
+      </div>
+    </div>
+
+    {/* Floating Action Bar */}
+    <div className={`${styles.actionBar} no-print`}>
+       <Link href="/" className={`${styles.actionButton} ${styles.secondary}`}>&larr; Back to Search</Link>
+       <button onClick={() => setShowModal(true)} disabled={isGenerating} className={styles.actionButton}>
+          Export PDF
+       </button>
+    </div>
+
+    {/* Advanced Generator Modal */}
+    {showModal && (
+        <div className={styles.modalOverlay}>
+            <div className={styles.modalContent}>
+                <h2 className={styles.modalTitle}>Print Setup</h2>
+                
+                <div className={styles.modalOption}>
+                    <input 
+                       id="expandAll" 
+                       type="checkbox" 
+                       checked={expandAll} 
+                       onChange={(e) => setExpandAll(e.target.checked)} 
+                    />
+                    <label htmlFor="expandAll">Expand all articles fully</label>
                 </div>
-              </div>
-
-              {getImageUrl(mainPost) && (
-                <div className={styles.heroImageContainer}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={getImageUrl(mainPost)!} alt="" className={styles.articleImage} />
+                
+                <div className={styles.modalOption}>
+                    <input 
+                       id="inclComments" 
+                       type="checkbox" 
+                       checked={includeComments} 
+                       onChange={(e) => setIncludeComments(e.target.checked)} 
+                    />
+                    <label htmlFor="inclComments">Include &quot;Letters to the Editor&quot; (Reddit Comments)</label>
                 </div>
-              )}
+
+                <div className={styles.modalActions}>
+                    <button onClick={() => setShowModal(false)} className={`${styles.actionButton} ${styles.secondary}`} disabled={isGenerating}>Cancel</button>
+                    <button onClick={startPdfGeneration} className={styles.actionButton} disabled={isGenerating}>
+                        {isGenerating ? "Typesetting..." : "Generate Document"}
+                    </button>
+                </div>
             </div>
-          </a>
-        )}
-
-        {/* Masonic Layout for the Rest */}
-        <div className={styles.columns}>
-          {restPosts.map(post => (
-            <a key={post.data.id} href={`https://www.reddit.com${post.data.permalink}`} target="_blank" rel="noopener noreferrer" className={styles.article}>
-              <h3 className={`${styles.articleTitle} ${styles.secondaryArticleTitle}`}>{post.data.title}</h3>
-              <p className={styles.byline}>By {post.data.author}</p>
-              {getImageUrl(post) && (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={getImageUrl(post)!} alt="" className={styles.articleImage} />
-              )}
-              <div className={styles.content}>
-                <p>{post.data.selftext ? post.data.selftext.substring(0, 250) + '...' : 'Further discussion suggests diverging opinions on the matter.'}</p>
-              </div>
-            </a>
-          ))}
         </div>
-      </div>
-
-      {/* Floating Action Bar */}
-      <div className={`${styles.actionBar} no-print`}>
-        <Link href="/" className={`${styles.actionButton} ${styles.secondary}`}>&larr; Back to Search</Link>
-        <button onClick={handlePdfDownload} disabled={isGenerating} className={styles.actionButton}>
-          {isGenerating ? "Exporting..." : "Download PDF"}
-        </button>
-      </div>
+    )}
     </>
   );
 }

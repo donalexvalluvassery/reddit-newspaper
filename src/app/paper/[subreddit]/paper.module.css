@@ -130,15 +130,15 @@
   text-align: justify;
 }
 
-/* Drop Cap for the first letter of the main article */
-.heroArticle .content > p:first-of-type::first-letter,
-.dropCap::first-letter {
+/* Drop Cap physically injected span */
+.dropCapLetter {
   font-family: var(--font-playfair), serif;
   font-size: 4.5rem;
   font-weight: bold;
   float: left;
-  line-height: 1;
+  line-height: 0.8;
   padding-right: 0.5rem;
+  padding-top: 0.5rem;
   margin-top: -0.2rem;
 }
 
@@ -202,8 +202,105 @@
   box-shadow: 0px 0px 0px rgba(0,0,0,0.5);
 }
 
+.readMoreBtn {
+  background: transparent;
+  border: 1px dashed var(--border-ink);
+  color: var(--text-ink);
+  padding: 0.25rem 0.5rem;
+  font-family: var(--font-playfair), serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  display: inline-block;
+  font-weight: bold;
+}
+
+.readMoreBtn:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.lettersSection {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--border-ink);
+  font-family: var(--font-lora), serif;
+}
+
+.lettersTitle {
+  font-family: var(--font-playfair), serif;
+  font-size: 1.2rem;
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.commentBlock {
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  border-left: 3px double var(--border-ink);
+  font-size: 0.95rem;
+}
+
+.commentAuthor {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.articleLinks {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  font-style: italic;
+  font-family: var(--font-lora), serif;
+}
+
+/* Modal Styling */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modalContent {
+  background: var(--bg-paper);
+  padding: 2rem;
+  border: 2px solid var(--border-ink);
+  box-shadow: 8px 8px 0px var(--border-ink);
+  width: 90%;
+  max-width: 500px;
+  font-family: var(--font-playfair), serif;
+}
+
+.modalTitle {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-ink);
+  padding-bottom: 0.5rem;
+}
+
+.modalOption {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-lora), serif;
+  font-size: 1.1rem;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
 @media print {
-  .actionBar {
+  .actionBar, .modalOverlay {
     display: none !important;
   }
   .newspaperContainer {
