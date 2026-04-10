@@ -78,11 +78,17 @@ export default function Newspaper({ params }: { params: { subreddit: string } })
   };
 
   const getImageUrl = (post: RedditPost) => {
+    let url = null;
     if (post.data.post_hint === "image" && !post.data.is_video) {
-      return post.data.url;
+      url = post.data.url;
+    } else if (post.data.url && post.data.url.match(/\.(jpeg|jpg|gif|png)$/i)) {
+      url = post.data.url;
     }
-    if (post.data.url && post.data.url.match(/\.(jpeg|jpg|gif|png)$/i)) {
-      return post.data.url;
+    
+    if (url) {
+      // Decode HTML entities that Reddit sometimes includes in URLs (like &amp;)
+      const cleanUrl = url.replace(/&amp;/g, '&');
+      return `/api/image-proxy?url=${encodeURIComponent(cleanUrl)}`;
     }
     return null;
   };
@@ -133,7 +139,7 @@ export default function Newspaper({ params }: { params: { subreddit: string } })
               {getImageUrl(mainPost) && (
                 <div className={styles.heroImageContainer}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={getImageUrl(mainPost)!} alt="" className={styles.articleImage} crossOrigin="anonymous" />
+                  <img src={getImageUrl(mainPost)!} alt="" className={styles.articleImage} />
                 </div>
               )}
             </div>
@@ -148,7 +154,7 @@ export default function Newspaper({ params }: { params: { subreddit: string } })
               <p className={styles.byline}>By {post.data.author}</p>
               {getImageUrl(post) && (
                 /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={getImageUrl(post)!} alt="" className={styles.articleImage} crossOrigin="anonymous" />
+                <img src={getImageUrl(post)!} alt="" className={styles.articleImage} />
               )}
               <div className={styles.content}>
                 <p>{post.data.selftext ? post.data.selftext.substring(0, 250) + '...' : 'Further discussion suggests diverging opinions on the matter.'}</p>
