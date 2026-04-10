@@ -1,0 +1,89 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: var(--font-playfair), serif;
+  text-align: center;
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+  border-bottom: 4px double var(--border-ink);
+  padding-bottom: 1rem;
+}
+
+.subtitle {
+  font-family: var(--font-lora), serif;
+  font-size: 1.25rem;
+  font-style: italic;
+  margin-bottom: 3rem;
+  color: #333;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  background: transparent;
+  padding: 2rem;
+  border: 2px solid var(--border-ink);
+  box-shadow: 6px 6px 0px var(--border-ink);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.label {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.input {
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid var(--border-ink);
+  background-color: #faf8f2;
+  font-family: var(--font-lora), serif;
+}
+
+.input:focus {
+  outline: 2px solid var(--border-ink);
+  outline-offset: 2px;
+}
+
+.button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--bg-paper);
+  background-color: var(--text-ink);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-playfair), serif;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  background-color: #333;
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px var(--border-ink);
+}
+
+.button:active {
+  transform: translate(0, 0);
+  box-shadow: 0px 0px 0px var(--border-ink);
+}

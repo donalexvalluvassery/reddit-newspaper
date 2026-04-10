@@ -1,0 +1,199 @@
+.newspaperContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--bg-paper);
+  color: var(--text-ink);
+  font-family: var(--font-lora), serif;
+}
+
+.header {
+  text-align: center;
+  border-bottom: 2px solid var(--border-ink);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+
+.title {
+  font-family: var(--font-playfair), serif;
+  font-size: 5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -2px;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  border-top: 2px solid var(--border-ink);
+  border-bottom: 2px solid var(--border-ink);
+  padding: 0.5rem 0;
+  margin-top: 1rem;
+  font-family: var(--font-lora), serif;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2rem;
+}
+
+.mainArticle {
+  grid-column: span 8;
+  border-right: 1px solid var(--border-ink);
+  padding-right: 2rem;
+}
+
+.sideBar {
+  grid-column: span 4;
+}
+
+.bottomArticles {
+  grid-column: span 12;
+  border-top: 2px solid var(--border-ink);
+  padding-top: 2rem;
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.article {
+  margin-bottom: 2rem;
+}
+
+.articleTitle {
+  font-family: var(--font-playfair), serif;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.mainArticleTitle {
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.secondaryArticleTitle {
+  font-size: 1.5rem;
+}
+
+.smallArticleTitle {
+  font-size: 1.2rem;
+}
+
+.byline {
+  font-family: var(--font-lora), serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.5rem;
+}
+
+.mainByline {
+  text-align: center;
+}
+
+.content {
+  font-family: var(--font-lora), serif;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+/* Drop Cap for the first letter of the main article */
+.mainArticle .content > p:first-of-type::first-letter,
+.dropCap::first-letter {
+  font-family: var(--font-playfair), serif;
+  font-size: 4.5rem;
+  font-weight: bold;
+  float: left;
+  line-height: 1;
+  padding-right: 0.5rem;
+  margin-top: -0.2rem;
+}
+
+.articleImage {
+  width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+  filter: grayscale(100%) contrast(1.2) sepia(20%);
+  border: 1px solid var(--border-ink);
+}
+
+.loading {
+  text-align: center;
+  font-family: var(--font-playfair), serif;
+  font-size: 2rem;
+  margin-top: 4rem;
+}
+
+.actionBar {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  gap: 1rem;
+  z-index: 100;
+}
+
+.actionButton {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--bg-paper);
+  background-color: var(--text-ink);
+  border: 2px solid var(--text-ink);
+  cursor: pointer;
+  font-family: var(--font-playfair), serif;
+  box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+  transition: all 0.2s ease;
+}
+
+.actionButton.secondary {
+  background-color: var(--bg-paper);
+  color: var(--text-ink);
+}
+
+.actionButton:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px rgba(0,0,0,0.5);
+}
+
+.actionButton:active {
+  transform: translate(0, 0);
+  box-shadow: 0px 0px 0px rgba(0,0,0,0.5);
+}
+
+@media print {
+  .actionBar {
+    display: none !important;
+  }
+  .newspaperContainer {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  .articleImage {
+    filter: grayscale(100%);
+  }
+}
+
+@media (max-width: 768px) {
+  .mainArticle, .sideBar, .bottomArticles {
+    grid-column: span 12;
+    border-right: none;
+    padding-right: 0;
+  }
+  .bottomArticles {
+    grid-template-columns: 1fr;
+  }
+}
